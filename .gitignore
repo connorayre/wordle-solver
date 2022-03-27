@@ -1,4 +1,11 @@
+# ------------------------------------------------------------------------------
 # wordle-solver project gitignore
+#
+# March 2022, Connor Ayre, Tom Zhu, Zakaria Ismail
+#
+# Copyright (c) 2022
+# All rights reserved.
+# ------------------------------------------------------------------------------
 
 # For Mac
 .DS_Store
