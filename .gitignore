@@ -2,3 +2,7 @@
 
 # For Mac
 .DS_Store
+
+# Virtual environment
+.env
+env
