@@ -6,3 +6,6 @@
 # Virtual environment
 .env
 env
+
+# Vscode
+.vscode
