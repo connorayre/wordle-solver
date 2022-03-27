@@ -10,21 +10,30 @@ This will create a new directory named "wordle-solver" containing the repo conte
 I know there exist other ways to clone, but I only know how to do so via SSH and terminal. Please ask if you need help.
 
 Please create a virtual environment locally on your machine under this "wordle-solver" directory using:
-`$ python3 -m venv .env`
+
+```$ python3 -m venv .env```
+
 This will create a "hidden" directory.
 
 Activate the python3 virtual environment using:
-`source .env/bin/activate`
+
+```source .env/bin/activate```
+
 Your terminal will now look like:
-`(.env) zakaisma@ZAKAISMA-M-XGTY wordle-solver % `
+
+```(.env) zakaisma@ZAKAISMA-M-XGTY wordle-solver % ```
 
 Install all current dependencies using (haven't tried this out yet):
-`$ pip3 install -r requirements.txt`
+
+```$ pip3 install -r requirements.txt```
 
 If you need to install any new libraries, use:
-`$ pip3 install <library name>`
+
+```$ pip3 install <library name>```
+
 and then update requirements.txt using:
-`$ pip3 freeze > requirements.txt`
+
+```$ pip3 freeze > requirements.txt```
 
 ## Dependencies
 
