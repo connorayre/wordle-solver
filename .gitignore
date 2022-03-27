@@ -1,0 +1,4 @@
+# wordle-solver project gitignore
+
+# For Mac
+.DS_Store
