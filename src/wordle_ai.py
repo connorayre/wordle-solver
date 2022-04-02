@@ -15,9 +15,8 @@ Possible optimizations:
 """
 
 # Python imports
-from ctypes import pointer
 from enum import Enum
-from typing import GameState, List
+from typing import List
 
 class LetterState(Enum):
     GREY    = 0
@@ -29,7 +28,7 @@ class WordleAI:
     def __init__(self, words: set):
         self.possible_words = words
 
-    def prune_words(self, game_state: GameState):
+    def prune_words(self, game_state):
         """
         Prune words from the set of words.
 
