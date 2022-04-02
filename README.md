@@ -35,6 +35,11 @@ and then update requirements.txt using:
 
 ```$ pip3 freeze > requirements.txt```
 
+Run tests from wordle-solver directory using:
+
+```$ python3 -m tests.run_tests```
+
+
 ## Dependencies
 
 TBD
