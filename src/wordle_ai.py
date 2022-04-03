@@ -20,7 +20,7 @@ from typing import List
 import math
 
 class LetterState(Enum):
-    GREY    = 0
+    EMPTY    = 0
     YELLOW  = 1
     GREEN   = 2
 
@@ -65,6 +65,7 @@ class WordleAI:
         Returns:
             - ('dict'): critieria of words to not prune
         """
+        # TODO: I need to account for when the map is updated with new info
         keep_map = {
             0: [],
             1: [],
@@ -93,13 +94,17 @@ class WordleAI:
     def _get_remove_map(self, game_state) -> dict:
         """
         Gets letter->positions list MAP describing criteria of
-        words to prune
+        words to prune.
+
+        When a grey letter is found, the letter is marked to be
+        removed on
 
         Args:
             - game_state ('List[dict]): list of dictionaries describing guess outcomes
         Returns:
             - ('dict'): criteria of words to prune
         """
+        # TODO: I need to account for when the map is updated with new info
         remove_map = {}
         for guess in game_state:
             letter = guess['letter']
@@ -112,7 +117,7 @@ class WordleAI:
                     remove_map[letter] = []
                 remove_map[letter].append(position)
 
-            if state == LetterState.GREY:
+            if state == LetterState.EMPTY:
                 # Remove letter for all positions
                 if letter not in remove_map:
                     remove_map[letter] = []
@@ -123,7 +128,7 @@ class WordleAI:
     #***********************************************************************************************************
     #function to calculate entropy (expected value of information), returns a float
     #Args:
-    #     - word: (Str) word that the entropy is being calculated on, based on remaining_words
+    #     - word: (Str) word that the entropy is being calculated on, based on self.possible_words
     #     - game_state: (not used)
     def calculate_entropy(self, word, game_state) -> float:
         #initialize wordCount, entropy and single word array that contains a dictionary with letter and state
@@ -131,11 +136,11 @@ class WordleAI:
         wordCount = 0
         probability = 0.0
         information = 0.0
-        state_word = [{ "letter": word[0],  "state": LetterState.Empty},
-                       { "letter": word[1],  "state": LetterState.Empty},
-                       { "letter": word[2],  "state": LetterState.Empty},
-                       { "letter": word[3],  "state": LetterState.Empty},
-                       { "letter": word[4],  "state": LetterState.Empty}
+        state_word = [{ "letter": word[0],  "state": LetterState.EMPTY},
+                       { "letter": word[1],  "state": LetterState.EMPTY},
+                       { "letter": word[2],  "state": LetterState.EMPTY},
+                       { "letter": word[3],  "state": LetterState.EMPTY},
+                       { "letter": word[4],  "state": LetterState.EMPTY}
                       ]
                       
         #iterate over each possible state that the word can have
@@ -158,88 +163,88 @@ class WordleAI:
                             
                             #go over remaining words and if they fit under the current state, add 1 to wordcount
                             #this for loop is calculating the numerator for our p(x)
-                            for remaining_word in remaining_words:
+                            for remaining_word in self.possible_words:
                                 #-------------------------------------------
                                 #if our state says a certain letter is not in
-                                #the answer word (ie: LetterState = Empty), then if the remaining_word
+                                #the answer word (ie: LetterState = EMPTY), then if the remaining_word
                                 #contains that letter, we dont include the word in wordCount
 
-                                #(LetterState = Empty)
-                                if(state_word[0]["state"] == LetterState.Empty):
+                                #(LetterState = EMPTY)
+                                if(state_word[0]["state"] == LetterState.EMPTY):
                                     if(state_word[0]["letter"] in remaining_word):
                                         continue
-                                if(state_word[1]["state"] == LetterState.Empty):
+                                if(state_word[1]["state"] == LetterState.EMPTY):
                                     if(state_word[1]["letter"] in remaining_word):
                                         continue
-                                if(state_word[2]["state"] == LetterState.Empty):
+                                if(state_word[2]["state"] == LetterState.EMPTY):
                                     if(state_word[2]["letter"] in remaining_word):
                                         continue
-                                if(state_word[3]["state"] == LetterState.Empty):
+                                if(state_word[3]["state"] == LetterState.EMPTY):
                                     if(state_word[3]["letter"] in remaining_word):
                                         continue
-                                if(state_word[4]["state"] == LetterState.Empty):
+                                if(state_word[4]["state"] == LetterState.EMPTY):
                                     if(state_word[4]["letter"] in remaining_word):
                                         continue
                                 #-------------------------------------------
                                 #our state says our answer word contains the letter,
-                                #just not in the current location (ie: LetterState = Yellow)
+                                #just not in the current location (ie: LetterState = YELLOW)
                                 #so if the word contains the letter in that location
                                 #continue, or if the letter is not in the word
                                 #altogether then continue
 
-                                #(LetterState = Yellow)
-                                if(state_word[0]["state"] == LetterState.Yellow):
+                                #(LetterState = YELLOW)
+                                if(state_word[0]["state"] == LetterState.YELLOW):
                                     if(remaining_word[0] == state_word[0]["letter"]):
                                         continue
                                     if(not state_word[0]["letter"] in remaining_word):
                                         continue
-                                if(state_word[1]["state"] == LetterState.Yellow):
+                                if(state_word[1]["state"] == LetterState.YELLOW):
                                     if(remaining_word[1] == state_word[1]["letter"]):
                                         continue
                                     if(not state_word[1]["letter"] in remaining_word):
                                         continue
-                                if(state_word[2]["state"] == LetterState.Yellow):
+                                if(state_word[2]["state"] == LetterState.YELLOW):
                                     if(remaining_word[2] == state_word[2]["letter"]):
                                         continue
                                     if(not state_word[2]["letter"] in remaining_word):
                                         continue
-                                if(state_word[3]["state"] == LetterState.Yellow):
+                                if(state_word[3]["state"] == LetterState.YELLOW):
                                     if(remaining_word[3] == state_word[3]["letter"]):
                                         continue
                                     if(not state_word[3]["letter"] in remaining_word):
                                         continue
-                                if(state_word[4]["state"] == LetterState.Yellow):
+                                if(state_word[4]["state"] == LetterState.YELLOW):
                                     if(remaining_word[4] == state_word[4]["letter"]):
                                         continue
                                     if(not state_word[4]["letter"] in remaining_word):
                                         continue
                                 #-------------------------------------------
                                 #our state says that the letter is in the correct
-                                #position(ie: LetterState = Green), so we check if the word has the letter
+                                #position(ie: LetterState = GREEN), so we check if the word has the letter
                                 #in the correct position, and if not continue
 
-                                #(LetterState = Green)
-                                if(state_word[0]["state"] == LetterState.Green):
+                                #(LetterState = GREEN)
+                                if(state_word[0]["state"] == LetterState.GREEN):
                                     if(not remaining_word[0] == state_word[0]["letter"]):
                                         continue
-                                if(state_word[1]["state"] == LetterState.Green):
+                                if(state_word[1]["state"] == LetterState.GREEN):
                                     if(not remaining_word[1] == state_word[1]["letter"]):
                                         continue
-                                if(state_word[2]["state"] == LetterState.Green):
+                                if(state_word[2]["state"] == LetterState.GREEN):
                                     if(not remaining_word[2] == state_word[2]["letter"]):
                                         continue
-                                if(state_word[3]["state"] == LetterState.Green):
+                                if(state_word[3]["state"] == LetterState.GREEN):
                                     if(not remaining_word[3] == state_word[3]["letter"]):
                                         continue
-                                if(state_word[4]["state"] == LetterState.Green):
+                                if(state_word[4]["state"] == LetterState.GREEN):
                                     if(not remaining_word[4] == state_word[4]["letter"]):
                                         continue
-                                #if we make it to this point, then the remaining_word from remaining_words is a possibility for that state
+                                #if we make it to this point, then the remaining_word from self.possible_words is a possibility for that state
                                 #so we increase wordcount
                                 wordCount += 1
 
                             #calculate the probability for this given state
-                            probability = (wordCount/len(remaining_words))
+                            probability = (wordCount/len(self.possible_words))
                             #in the case probability is 0, just continue
                             if(probability == 0):
                                continue
