@@ -12,6 +12,11 @@ import unittest
 from src.wordle_ai import *
 
 class TestWordleAI(unittest.TestCase):
+    """
+    TODO: test with multi-occurring letter answer word and guess(es)
+    Example test words:
+        - DODDY
+    """
 
     def setUp(self) -> None:
         self.word_set_1 = {
@@ -21,29 +26,31 @@ class TestWordleAI(unittest.TestCase):
             "avunt"
         }
 
+        # Guessed word(s): ducks
+        # Answer: avoid
         self.game_state_1 = [
-            {'letter':'d', 'state':LetterState.YELLOW.value, 'position':0},
-            {'letter':'u', 'state':LetterState.EMPTY.value, 'position':1},
-            {'letter':'c', 'state':LetterState.EMPTY.value, 'position':2},
-            {'letter':'k', 'state':LetterState.EMPTY.value, 'position':3},
-            {'letter':'s', 'state':LetterState.EMPTY.value, 'position':4}
+            {'letter':'d', 'state':LetterState.YELLOW, 'position':0},
+            {'letter':'u', 'state':LetterState.EMPTY, 'position':1},
+            {'letter':'c', 'state':LetterState.EMPTY, 'position':2},
+            {'letter':'k', 'state':LetterState.EMPTY, 'position':3},
+            {'letter':'s', 'state':LetterState.EMPTY, 'position':4}
         ]
 
     def test_1_prune_words(self):
         # Target answer: avoid
         # Guessed word(s): ducks
         # Any word with u,c,k,s shall be removed
-        #import pdb; pdb.set_trace()
+        # AND
+        # Any word with d shall be kept
 
         expected_output_set = {
-            "avoid",
-            "avoir",
-            "avons",
+            "avoid"
         }
      
         ai = WordleAI(self.word_set_1)
         ai.prune_words(self.game_state_1)  # error: 'avunt' is not getting removed
-        self.assertEqual(expected_output_set, ai.possible_words)
+        print(ai.possible_words, expected_output_set)
+        self.assertEqual(ai.possible_words, expected_output_set)
         
     def test_2_get_remove_map(self):
         # Target answer: avoid
@@ -57,7 +64,7 @@ class TestWordleAI(unittest.TestCase):
         }
 
         ai = WordleAI(self.word_set_1)
-        self.assertEqual(expected_output, ai._get_remove_map(self.game_state_1))
+        self.assertEqual(ai._get_remove_map(self.game_state_1), expected_output)
 
 
     def test_3_get_keep_map(self):
@@ -65,12 +72,21 @@ class TestWordleAI(unittest.TestCase):
         # Guessed word(s): ducks
         expected_output = {
             0:[],
-            1:['d'],
-            2:['d'],
-            3:['d'],
-            4:['d']
+            1:[],
+            2:[],
+            3:[],
+            4:[]
         }
 
+        #import pdb; pdb.set_trace()
         ai = WordleAI(self.word_set_1)
-        self.assertEqual(expected_output, ai._get_keep_map(self.game_state_1))
+        self.assertEqual(ai._get_keep_map(self.game_state_1), expected_output)
+
+    def test_4_get_yellow_set(self):
+        # Target answer: avoid
+        # Guessed word(s): ducks
+        expected_output = {'d'}
+
+        ai = WordleAI(self.word_set_1)
+        self.assertEqual(ai._get_yellow_set(self.game_state_1), expected_output)
 

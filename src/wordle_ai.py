@@ -38,22 +38,46 @@ class WordleAI:
         """
         keep_map = self._get_keep_map(game_state)
         remove_map = self._get_remove_map(game_state)
+        yellow_set = self._get_yellow_set(game_state)
+        removed_words = set()
         for word in self.possible_words:
             to_remove = False
+            temp_set = yellow_set.copy()    # if this set is not empty after all word letters, remove word
+                                            # how does this handle multi-occurring letters?
             for position in range(len(word)):
                 letter = word[position]
 
-                # Remove words where letter->position combo are in remove_map
-                if letter in remove_map and position in remove_map[letter]:
+                if letter in keep_map[position]:
+                    # Letter at position is known and letter is correct
+                    break
+                elif keep_map[position] == []:
+                    # Letter at position is not known yet
+                    pass
+                else:
+                    # Letter at position is known and letter is not correct
                     to_remove = True
-
-                # Remove words where position->letter are not in keep_map
-                if keep_map[position] != [] and letter not in keep_map[position]:
+                    break
+                
+                if letter not in remove_map or position not in remove_map[letter]:
+                    # We don't know if letter is not at the position and we
+                    #   also don't know if it is at that position
+                    pass
+                else:
+                    # Letter is known to not be at position
                     to_remove = True
+                    break
 
+                if letter in temp_set:
+                    temp_set.remove(letter)
+
+            if len(temp_set) > 0:
+                to_remove = True
+                
             if to_remove:
-                self.possible_words.remove(word)
+                #self.possible_words.remove(word)
+                removed_words.add(word)
         
+        self.possible_words = self.possible_words - removed_words        
 
     def _get_keep_map(self, game_state: dict) -> dict:
         """
@@ -73,6 +97,8 @@ class WordleAI:
             3: [],
             4: []
         }
+        is_locked = [False for i in range(5)]
+
         for guess in game_state:
             letter = guess['letter']
             state = guess['state']
@@ -80,16 +106,31 @@ class WordleAI:
 
             if state == LetterState.GREEN:
                 # add letter to position's list
-                # Q: should I also add to all other positions?
-                if letter not in keep_map[position]: keep_map[position].append(letter)
-            
-            if state == LetterState.YELLOW:
-                # add letter to all other positions' lists
-                for i in range(0, 5):
-                    if i != position:
-                        if letter not in keep_map[position]: keep_map[i].append(letter)
+                # Remove all other letters at position and add letter
+                keep_map[position] = [letter]
+                # Switch lock for position on to prevent other letters
+                #   from being added to the position's list
+                is_locked[position] = True
             
         return keep_map
+
+    def _get_yellow_set(self, game_state):
+        """
+        Gets set of letters whose positions are unknown
+        but are known to be in the final word
+        """
+        yellow_set = set()
+        for guess in game_state:
+            letter = guess['letter']
+            state = guess['state']
+            position = guess['position']
+
+            if state == LetterState.YELLOW:
+                # add letter to yellow set
+                if letter not in yellow_set: yellow_set.add(letter)
+        
+        return yellow_set
+        
     
     def _get_remove_map(self, game_state) -> dict:
         """
@@ -115,13 +156,14 @@ class WordleAI:
                 # Remove letter for single position
                 if letter not in remove_map:
                     remove_map[letter] = []
-                remove_map[letter].append(position)
+                if position not in remove_map[letter]: remove_map[letter].append(position)
 
             if state == LetterState.EMPTY:
                 # Remove letter for all positions
                 if letter not in remove_map:
                     remove_map[letter] = []
-                remove_map[letter] += [0,1,2,3,4]
+                for i in range(5):
+                    if i not in remove_map[letter]: remove_map[letter] += [i]
         
         return remove_map
 
