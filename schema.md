@@ -12,7 +12,8 @@ Game State
   [
     {
       "letter": "char", 
-      "state": "LetterState"
+      "state": "LetterState",
+      "position": "int"
     }
   ],
 ]
