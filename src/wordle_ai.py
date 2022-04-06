@@ -18,6 +18,7 @@ Possible optimizations:
 from enum import Enum
 from typing import List
 import math
+from wordle_db import words
 
 class LetterState(Enum):
     EMPTY    = 0
@@ -26,8 +27,10 @@ class LetterState(Enum):
 
 class WordleAI:
 
-    def __init__(self, words: set):
-        self.possible_words = words
+    def __init__(self, wordset: set):
+        if wordset is None:
+            wordset = words 
+        self.possible_words = set(wordset)
 
     def prune_words(self, game_state):
         """
@@ -72,7 +75,7 @@ class WordleAI:
 
             if len(temp_set) > 0:
                 to_remove = True
-                
+
             if to_remove:
                 #self.possible_words.remove(word)
                 removed_words.add(word)
