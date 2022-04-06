@@ -10,8 +10,10 @@
 from wordle_game import WordleGame
 from wordle_db import words
 from wordle_ai import *
+from wordle_api import *
+from wordle_db3 import wordset
 
-def main():
+def old_main():
     # TODO: add word frequency check
     game = WordleGame(words)
     game.start_game()
@@ -50,6 +52,30 @@ def main():
         # 5. Repeat 2-4 until answer is guessed or 6 guesses
         #   have been made
         count += 1
+    
+def main():
+    game = WordleAPI()
+    ai = WordleAI(wordset)
+
+    status = game.start_game()
+    # 1. Insert default first guess
+    status = game.guess('crane')
+    while status == GameStatus.ONGOING:
+        # 2. Prune list based on result
+        ai.prune_words(game.get_game_state())
+        # 3. Calculate entropy for all remaining words and
+        #   select word with highest entropy
+        max_entropy = 0.0
+        next_guess = None
+
+        for word in ai.possible_words:
+            if ai.calculate_entropy(word) > max_entropy:
+                next_guess = word
+        
+        # 4. Guess word and get result
+        status = game.guess(next_guess)
+        # 5. Repeat 2-4 until answer is guessed or max guesses
+        #   have been made
     
 
 if __name__ == "__main__":

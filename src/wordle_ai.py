@@ -175,7 +175,7 @@ class WordleAI:
     #Args:
     #     - word: (Str) word that the entropy is being calculated on, based on self.possible_words
     #     - game_state: (not used)
-    def calculate_entropy(self, word, game_state) -> float:
+    def calculate_entropy(self, word, game_state=None) -> float:
         #initialize wordCount, entropy and single word array that contains a dictionary with letter and state
         entropy = 0.0
         wordCount = 0
