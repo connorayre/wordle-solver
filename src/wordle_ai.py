@@ -159,26 +159,36 @@ class WordleAI:
             3:{letter for letter in ascii_lowercase},
             4:{letter for letter in ascii_lowercase}
         }
+        locks = {i: False for i in range(5)}
 
         for guess in game_state:
             letter = guess['letter']
             state = guess['state']
             position = guess['position']
-
-            if state == LetterState.GREEN:
+            print(guess)
+            if state is LetterState.GREEN:
                 # Remove all other letters at position
-                pos_letter_map[position] = [letter]
+                print(f"letter #{position+1} is {letter}")
+                locks[position] = True
+                pos_letter_map[position] = {letter}
+                continue
 
-            if state == LetterState.YELLOW:
+            if state is LetterState.YELLOW:
                 # Remove letter at position
                 if letter in pos_letter_map[position]:
-                    pos_letter_map[position].remove(letter)
+                    # pos_letter_map[position].remove(letter)
+                    pos_letter_map[position] -= {letter}
+                continue
 
-            if state == LetterState.EMPTY:
+            if state is LetterState.EMPTY:
                 # Remove letter at all positions
+                # Edit:
+                #   - if a letter is marked as empty, remove
+                #       it at all NON-LOCKED positions
                 for pos in range(5):
-                    if letter in pos_letter_map[pos]:
-                        pos_letter_map[pos].remove(letter)
+                    if not locks[pos]:
+                        pos_letter_map[pos] -= {letter}
+                continue
 
         return pos_letter_map
     
