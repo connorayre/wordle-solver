@@ -35,7 +35,7 @@ class WordleAPI():
         self.answer = None
 
     
-    def start_game(self):
+    def start_game(self, word_id=None):
         print("Starting game")
         # Init variables
         self.game_state = []
@@ -43,9 +43,13 @@ class WordleAPI():
         self.num_guesses = 0
         self.answer = None
         request_url = self.url + 'api/v1/start_game/'
+        data = {}
+        if word_id is not None:
+            self.id = word_id
+            data['wordID'] = word_id
 
         # Send request
-        response = requests.post(request_url)
+        response = requests.post(request_url, json=data)
         self._print_response(response)
 
         # Set response values

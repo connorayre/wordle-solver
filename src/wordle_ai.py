@@ -20,6 +20,7 @@ from typing import List
 import math
 from wordle_db import words
 from string import ascii_lowercase
+from pprint import pprint
 
 class LetterState(Enum):
     EMPTY    = 0
@@ -138,6 +139,7 @@ class WordleAI:
 
     def prune_words_v2(self, game_state):
         filter = self._get_position_letter_map(game_state)
+        pprint(f"filter map:\n{filter}")
         removed_words = set()
         for word in self.possible_words:
             for i, letter in enumerate(word):
