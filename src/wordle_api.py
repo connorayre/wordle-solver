@@ -32,6 +32,7 @@ class WordleAPI():
         self.key = None
         self.num_guesses = 0
         self.answer_found = False
+        self.answer = None
 
     
     def start_game(self):
@@ -40,6 +41,7 @@ class WordleAPI():
         self.game_state = []
         self.guess_history = []
         self.num_guesses = 0
+        self.answer = None
         request_url = self.url + 'api/v1/start_game/'
 
         # Send request
@@ -57,9 +59,9 @@ class WordleAPI():
         if self.num_guesses >= 6:
             print("Max guesses already performed")
             return GameStatus.MAX_GUESSES
+        print(f"Submitting guess: {guessed_word}")
         self.num_guesses += 1
         guessed_word.lower()
-        print(f"Submitting guess: {guessed_word}")
         # Set variables
         request_url = self.url + 'api/v1/guess/'
         data = {
@@ -90,7 +92,23 @@ class WordleAPI():
         return GameStatus.ONGOING
 
     def finish_game(self):
-       pass 
+        print("Calling finish_game()")
+        print(f"Number of guesses made: {self.num_guesses}")
+        # Set data
+        data = {
+            'id': self.id,
+            'key': self.key
+        }
+        request_url = self.url + 'api/v1/finish_game/'
+
+        # Send request
+        response = requests.post(request_url, json=data)
+
+        # Set response value
+        response_data = json.loads(response.text)
+
+        self.answer = response_data['answer']
+        print(f"Answer: {self.answer}")
 
     def _print_response(self, response):
         print(f"Status code: {response.status_code}")

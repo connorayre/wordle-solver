@@ -19,6 +19,7 @@ from enum import Enum
 from typing import List
 import math
 from wordle_db import words
+from string import ascii_lowercase
 
 class LetterState(Enum):
     EMPTY    = 0
@@ -133,7 +134,51 @@ class WordleAI:
                 if letter not in yellow_set: yellow_set.add(letter)
         
         return yellow_set
-        
+
+
+    def prune_words_v2(self, game_state):
+        filter = self._get_position_letter_map(game_state)
+        removed_words = set()
+        for word in self.possible_words:
+            for i, letter in enumerate(word):
+                if letter not in filter[i]:
+                    removed_words.add(word)
+                    break
+            
+        self.possible_words = self.possible_words - removed_words
+
+
+    def _get_position_letter_map(self, game_state):
+
+        pos_letter_map = {
+            0:{letter for letter in ascii_lowercase},
+            1:{letter for letter in ascii_lowercase},
+            2:{letter for letter in ascii_lowercase},
+            3:{letter for letter in ascii_lowercase},
+            4:{letter for letter in ascii_lowercase}
+        }
+
+        for guess in game_state:
+            letter = guess['letter']
+            state = guess['state']
+            position = guess['position']
+
+            if state == LetterState.GREEN:
+                # Remove all other letters at position
+                pos_letter_map[position] = [letter]
+
+            if state == LetterState.YELLOW:
+                # Remove letter at position
+                if letter in pos_letter_map[position]:
+                    pos_letter_map[position].remove(letter)
+
+            if state == LetterState.EMPTY:
+                # Remove letter at all positions
+                for pos in range(5):
+                    if letter in pos_letter_map[pos]:
+                        pos_letter_map[pos].remove(letter)
+
+        return pos_letter_map
     
     def _get_remove_map(self, game_state) -> dict:
         """
