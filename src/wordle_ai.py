@@ -139,7 +139,7 @@ class WordleAI:
 
     def prune_words_v2(self, game_state):
         filter = self._get_position_letter_map(game_state)
-        pprint(f"filter map:\n{filter}")
+        #pprint(f"filter map:\n{filter}")
         removed_words = set()
         for word in self.possible_words:
             for i, letter in enumerate(word):
@@ -168,7 +168,7 @@ class WordleAI:
             print(guess)
             if state is LetterState.GREEN:
                 # Remove all other letters at position
-                print(f"letter #{position+1} is {letter}")
+                #print(f"letter #{position+1} is {letter}")
                 locks[position] = True
                 pos_letter_map[position] = {letter}
                 continue

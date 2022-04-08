@@ -64,7 +64,7 @@ def main():
     while status == GameStatus.ONGOING:
         # 2. Prune list based on result
         ai.prune_words_v2(game.get_game_state())
-        print(ai.possible_words)
+        # print(ai.possible_words)
         # 3. Calculate entropy for all remaining words and
         #   select word with highest entropy
         max_entropy = 0.0

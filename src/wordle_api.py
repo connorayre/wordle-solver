@@ -21,6 +21,7 @@ class GameStatus(Enum):
     ONGOING         = 2
     MAX_GUESSES     = 3
     ANSWER_FOUND    = 4
+    ENDED           = 5
 
 class WordleAPI():
 
