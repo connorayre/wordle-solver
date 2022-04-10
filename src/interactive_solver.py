@@ -46,7 +46,7 @@ class InteractiveWordle():
         self.guess_history += [guess_input]
         self.game_state += self._format_state(
             self.guess_history[-1], result_input)
-        #print(self.ai.possible_words)
+
         self.ai.prune_words_v2(self.game_state)
 
         if result_input == 'ggggg':
@@ -73,12 +73,10 @@ class InteractiveWordle():
         if self.num_guesses > 0:
 
             entropy_heap = self._get_entropy_heap()
-            # print(f"Entropy heap {entropy_heap}")
             i = 0
             while i < 10 and i < len(entropy_heap):
                 # Print 10 words with largest entropies
                 popped = heappop(entropy_heap)
-                # print(f"popped: {popped}")
                 entropy, word = popped
                 print(f"- {word}: {entropy * -1}")
                 i += 1
@@ -90,10 +88,7 @@ class InteractiveWordle():
         entropy_heap = []
         print("calculating entropies...")
         for word in self.ai.possible_words:
-            #heappush(entropy_heap, self.ai.calculate_entropy(word))
-            #entropy_heap += [self.ai.calculate_entropy(word), word]
             heappush(entropy_heap, (-1 * self.ai.calculate_entropy(word), word))
-        # print(entropy_heap)
         return entropy_heap
 
     def end_game(self):
@@ -104,9 +99,6 @@ class InteractiveWordle():
 def main():
     game = InteractiveWordle(wordset3)
     game.start_game()
-    count = 0
-    guess = 0
-    answer = -1
 
     while game.status is not GameStatus.MAX_GUESSES and game.status is not GameStatus.ANSWER_FOUND:
         game.guess_word()

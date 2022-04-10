@@ -14,45 +14,6 @@ from wordle_api import *
 from wordle_db3 import wordset as wordset3
 from wordle_db2 import wordset as wordset2
 
-def old_main():
-    # TODO: add word frequency check
-    game = WordleGame(wordset2)
-    game.start_game()
-    ai = WordleAI(wordset2)
-
-    count = 1
-
-    # 1. Insert default first guess
-    initial_word = 'crans'
-    guessed_word = initial_word
-    game.guess_word(initial_word)    # i cannot find crane
-    print(f"Guessed {initial_word}")
-    while count <= 6 or ai.possible_words == set():
-        # TODO: how do I identify that word has been guessed?
-        #   - remove guessed word from set, causing
-        #       self.possible_words to become empty if word was
-        #       guessed?
-        # 2. Prune list of words based on result
-        ai.prune_words(game.get_state())
-        # 3. Calculate entropy for all of the remaining words
-        #   and select word with highest entropy
-        max_entropy = 0
-        guessed_word = None
-        for word in ai.possible_words:
-            if guessed_word is None:
-                # set initial entropy word
-                entropy_word = word
-            if ai.calculate_entropy(word) > max_entropy:
-                # set new word with highest entropy
-                entropy_word = word
-            
-        # 4. Guess word and get result
-        if guessed_word is not None:
-            print(f"Guessed {guessed_word}")
-            game.guess_word(guessed_word)
-        # 5. Repeat 2-4 until answer is guessed or 6 guesses
-        #   have been made
-        count += 1
     
 def main():
     game = WordleAPI()
@@ -64,7 +25,7 @@ def main():
     while status == GameStatus.ONGOING:
         # 2. Prune list based on result
         ai.prune_words_v2(game.get_game_state())
-        # print(ai.possible_words)
+        print(f"Remaining words - {len(ai.possible_words)}")
         # 3. Calculate entropy for all remaining words and
         #   select word with highest entropy
         max_entropy = 0.0

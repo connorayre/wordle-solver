@@ -145,5 +145,3 @@ if __name__ == "__main__":
         i+= 1
         print(i)
     print(f"Num guesses made: {i}")
-    #a.guess('crane')
-    #a.guess('oasis')

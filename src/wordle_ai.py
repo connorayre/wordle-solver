@@ -32,110 +32,7 @@ class WordleAI:
     def __init__(self, wordset: set):
         if wordset is None:
             wordset = words 
-        self.possible_words = set(wordset)
-
-    def prune_words(self, game_state):
-        """
-        Prune words from the set of words.
-
-        Args:
-            - game_state ('List[Dict]): list of dictionaries describing guess outcomes
-        """
-        keep_map = self._get_keep_map(game_state)
-        remove_map = self._get_remove_map(game_state)
-        yellow_set = self._get_yellow_set(game_state)
-        removed_words = set()
-        for word in self.possible_words:
-            to_remove = False
-            temp_set = yellow_set.copy()    # if this set is not empty after all word letters, remove word
-                                            # how does this handle multi-occurring letters?
-            for position in range(len(word)):
-                letter = word[position]
-
-                if letter in keep_map[position]:
-                    # Letter at position is known and letter is correct
-                    break
-                elif keep_map[position] == []:
-                    # Letter at position is not known yet
-                    pass
-                else:
-                    # Letter at position is known and letter is not correct
-                    to_remove = True
-                    break
-                
-                if letter not in remove_map or position not in remove_map[letter]:
-                    # We don't know if letter is not at the position and we
-                    #   also don't know if it is at that position
-                    pass
-                else:
-                    # Letter is known to not be at position
-                    to_remove = True
-                    break
-
-                if letter in temp_set:
-                    temp_set.remove(letter)
-
-            if len(temp_set) > 0:
-                to_remove = True
-
-            if to_remove:
-                #self.possible_words.remove(word)
-                removed_words.add(word)
-        
-        self.possible_words = self.possible_words - removed_words        
-
-    def _get_keep_map(self, game_state: dict) -> dict:
-        """
-        Gets position->letters list MAP describing criteria 
-        of words to not prune
-
-        Args:
-            - game_state ('List[dict]): list of dictionaries describing guess outcomes
-        Returns:
-            - ('dict'): critieria of words to not prune
-        """
-        # TODO: I need to account for when the map is updated with new info
-        keep_map = {
-            0: [],
-            1: [],
-            2: [],
-            3: [],
-            4: []
-        }
-        is_locked = [False for i in range(5)]
-
-        for guess in game_state:
-            letter = guess['letter']
-            state = guess['state']
-            position = guess['position']
-
-            if state == LetterState.GREEN:
-                # add letter to position's list
-                # Remove all other letters at position and add letter
-                keep_map[position] = [letter]
-                # Switch lock for position on to prevent other letters
-                #   from being added to the position's list
-                is_locked[position] = True
-            
-        return keep_map
-
-    def _get_yellow_set(self, game_state):
-        """
-        Gets set of letters whose positions are unknown
-        but are known to be in the final word
-        """
-        yellow_set = set()
-        for guess in game_state:
-            letter = guess['letter']
-            state = guess['state']
-            position = guess['position']
-
-            if state == LetterState.YELLOW:
-                # add letter to yellow set
-                if letter not in yellow_set: yellow_set.add(letter)
-        
-        return yellow_set
-
+        self.possible_words = set(wordset)        
 
     def prune_words_v2(self, game_state):
         filter = self._get_position_letter_map(game_state)
@@ -148,7 +45,6 @@ class WordleAI:
                     break
             
         self.possible_words = self.possible_words - removed_words
-
 
     def _get_position_letter_map(self, game_state):
 
@@ -165,10 +61,8 @@ class WordleAI:
             letter = guess['letter']
             state = guess['state']
             position = guess['position']
-            print(guess)
             if state is LetterState.GREEN:
                 # Remove all other letters at position
-                #print(f"letter #{position+1} is {letter}")
                 locks[position] = True
                 pos_letter_map[position] = {letter}
                 continue
@@ -176,7 +70,6 @@ class WordleAI:
             if state is LetterState.YELLOW:
                 # Remove letter at position
                 if letter in pos_letter_map[position]:
-                    # pos_letter_map[position].remove(letter)
                     pos_letter_map[position] -= {letter}
                 continue
 
@@ -192,40 +85,6 @@ class WordleAI:
 
         return pos_letter_map
     
-    def _get_remove_map(self, game_state) -> dict:
-        """
-        Gets letter->positions list MAP describing criteria of
-        words to prune.
-
-        When a grey letter is found, the letter is marked to be
-        removed on
-
-        Args:
-            - game_state ('List[dict]): list of dictionaries describing guess outcomes
-        Returns:
-            - ('dict'): criteria of words to prune
-        """
-        # TODO: I need to account for when the map is updated with new info
-        remove_map = {}
-        for guess in game_state:
-            letter = guess['letter']
-            state = guess['state']
-            position = guess['position']
-
-            if state == LetterState.YELLOW:
-                # Remove letter for single position
-                if letter not in remove_map:
-                    remove_map[letter] = []
-                if position not in remove_map[letter]: remove_map[letter].append(position)
-
-            if state == LetterState.EMPTY:
-                # Remove letter for all positions
-                if letter not in remove_map:
-                    remove_map[letter] = []
-                for i in range(5):
-                    if i not in remove_map[letter]: remove_map[letter] += [i]
-        
-        return remove_map
 
     #***********************************************************************************************************
     #function to calculate entropy (expected value of information), returns a float
