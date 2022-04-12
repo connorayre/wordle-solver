@@ -12,19 +12,19 @@ def main():
 
   while True:
     print(game)
-    print("Calculating...")
+    # print("Calculating...")
 
-    top_words = []
-    for word in ai.possible_words:
-      heapq.heappush(top_words, (ai.calculate_entropy(word), word))
+    # top_words = []
+    # for word in ai.possible_words:
+    #   heapq.heappush(top_words, (ai.calculate_entropy(word), word))
     
-    for entropy, word in heapq.nlargest(10, top_words):
-      print(f"{word}: {entropy}")
+    # for entropy, word in heapq.nlargest(10, top_words):
+    #   print(f"{word}: {entropy}")
 
     if game.guess(input("Guess: ")) != GameStatus.ONGOING:
       break
     
-    ai.prune_words_v2(game.get_game_state())
+    # ai.prune_words_v2(game.get_game_state())
 
 if __name__ == "__main__":
   main()
