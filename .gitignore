@@ -16,3 +16,6 @@ env
 
 # Vscode
 .vscode
+
+# Ignore .tar
+.tar
