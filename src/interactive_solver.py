@@ -74,7 +74,8 @@ class InteractiveWordle():
 
             entropy_heap = self._get_entropy_heap()
             i = 0
-            while i < 10 and i < len(entropy_heap):
+            sizeof_heap = len(entropy_heap)
+            while i < 10 and i < sizeof_heap:
                 # Print 10 words with largest entropies
                 popped = heappop(entropy_heap)
                 entropy, word = popped
