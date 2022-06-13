@@ -1,5 +1,5 @@
 # 2315 words from wordle api
-wordset = {
+wordset = [
 "cigar",
 "rebut",
 "sissy",
@@ -2315,4 +2315,4 @@ wordset = {
 "artsy",
 "rural",
 "shave"
-}
+]

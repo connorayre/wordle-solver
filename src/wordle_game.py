@@ -11,8 +11,8 @@ class WordleGame:
     if len(word) != 5 or word not in self.words:
       return GameStatus.ONGOING
 
-    if len(self.game_state) >= 6:
-      return GameStatus.MAX_GUESSES
+    # if len(self.game_state) >= 6:
+    #   return GameStatus.MAX_GUESSES
 
     if len(self.game_state) > 0 and "".join([guess["letter"] for guess in self.game_state[-1]]) == self.answer:
       return GameStatus.ANSWER_FOUND
@@ -42,8 +42,8 @@ class WordleGame:
     if word == self.answer:
       return GameStatus.ANSWER_FOUND
 
-    if len(self.game_state) >= 6:
-      return GameStatus.MAX_GUESSES
+    # if len(self.game_state) >= 6:
+    #   return GameStatus.MAX_GUESSES
 
     return GameStatus.ONGOING
 

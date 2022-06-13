@@ -19,8 +19,13 @@ from enum import Enum
 from typing import List
 import math
 from wordle_db import words
+# from wordle_db3 import wordset as words
 from string import ascii_lowercase
 from pprint import pprint
+from frequency_map import frequency_map
+import numpy as np
+import itertools
+import json
 
 class LetterState(Enum):
     EMPTY    = 0
@@ -30,6 +35,8 @@ class LetterState(Enum):
 class WordleAI:
 
     def __init__(self, wordset: set):
+        with open("word_indices.json", "r") as outfile:
+          self.word_indices = json.load(outfile)
         if wordset is None:
             wordset = words 
         self.possible_words = set(wordset)        
@@ -85,6 +92,118 @@ class WordleAI:
 
         return pos_letter_map
     
+    def save_indices(self): 
+        indices = dict()
+        for i, word in enumerate(words):
+            indices[word] = i
+        with open("word_indices.json", "w") as outfile:
+            json.dump(indices, outfile)
+        
+        return indices
+
+    def get_state_table(self):
+        table = np.zeros((len(words), len(words)))
+        
+        for i1, i2 in itertools.permutations(range(len(words)), 2):   
+            w1 = words[i1]
+            w2 = words[i2]
+            letter_indices = dict()
+            for i, letter in enumerate(w1):
+                if letter in letter_indices:
+                    letter_indices[letter].add(i)
+                else:
+                    letter_indices[letter] = set([i])
+
+            guess = 0
+            for i, c in enumerate(w2):
+                guess *= 10
+                if c in letter_indices and i in letter_indices[c]:
+                    letter_indices[c].remove(i)
+                    guess += LetterState.GREEN.value
+                else:
+                    guess += LetterState.EMPTY.value
+
+            for i, c in enumerate(w2):
+                if (guess // (10**(4-i))) % 10 == 0:
+                    if c in letter_indices and len(letter_indices[c]) > 0:
+                        guess += LetterState.YELLOW.value * (10**(4-i))  
+            
+            table[i1, i2] = guess
+        
+        np.fill_diagonal(table, 22222)
+        np.save("pat_table.npy", table)
+
+        return table
+
+    def get_frequencies(self):
+        def sigmoid(x):
+            return 1 / (1 + math.exp(-x))
+        width = 10
+        c = width * (-0.5 + 3000 / len(frequency_map.keys()))
+        space = np.linspace(c - width / 2, c + width / 2, len(words))
+        sorted_words = sorted(frequency_map.items(), key=lambda x: x[1])
+        normalized = dict()
+        for word, score in zip(sorted_words, space):
+            normalized[word[0]] = sigmoid(score)
+        self.frequencies = normalized
+        return normalized
+
+    def get_word_probabilities(self):
+        probs = np.array([self.frequencies[word] for word in self.possible_words])
+        tot = probs.sum()
+        if tot == 0:
+            return np.zeros(probs.shape)
+        return probs / tot
+
+    def calculate_entropy_v2(self, word, pattern_table):
+        entropy = 0.0
+        probability = 0.0
+        information = 0.0
+
+        i2 = self.word_indices[word]
+        w2 = word
+
+        counter = dict()
+        for index, possible_word in enumerate(self.possible_words):
+            
+            i1 = self.word_indices[possible_word]
+            # pattern = pattern_table[i1, i2]
+            w1 = possible_word
+            letter_indices = dict()
+            for i, letter in enumerate(w1):
+                if letter in letter_indices:
+                    letter_indices[letter].add(i)
+                else:
+                    letter_indices[letter] = set([i])
+            guess = 0
+            for i, c in enumerate(w2):
+                guess *= 10
+                if c in letter_indices and i in letter_indices[c]:
+                    letter_indices[c].remove(i)
+                    guess += LetterState.GREEN.value
+                else:
+                    guess += LetterState.EMPTY.value
+
+            for i, c in enumerate(w2):
+                if (guess // (10**(4-i))) % 10 == 0:
+                    if c in letter_indices and len(letter_indices[c]) > 0:
+                        guess += LetterState.YELLOW.value * (10**(4-i))  
+            pattern = guess
+            
+            if pattern not in counter:
+                counter[pattern] = 0
+            counter[pattern] += 1
+        
+        for pat in counter:
+            probability = (counter[pat]/len(self.possible_words))
+            #in the case probability is 0, just continue
+            if(probability == 0):
+                continue
+            #calculate the information and add it to entropy
+            information = (probability) * (math.log2(1/probability))
+            entropy = entropy + information
+        return entropy + self.frequencies[word]
+
 
     #***********************************************************************************************************
     #function to calculate entropy (expected value of information), returns a float
