@@ -1,5 +1,4 @@
-# I, Connor Ayre, specifically developed the calculate_entropy function in the file located at wordle-solver/src
-/wordle_ai.py starting at line 208 as well as aided in the rest of the software.
+## I, Connor Ayre, specifically developed the calculate_entropy function in the file located at wordle-solver/src/wordle_ai.py starting at line 208 as well as aided in the rest of the software.
 
 
 
